@@ -4,76 +4,73 @@
 #include <cstring>
 #include <QErrorMessage>
 #include <sstream>
-
-enum morse {
-    END, DIT, DAH
-};
+#include <iostream>
 
 enum breaktype {
     NONE, LETTER, WORD, SENTENCE
 };
 
-const morse * code(const QChar c) {
+std::string code(const QChar c) {
     switch (c.toLatin1()) {
-    case 'A': return (const morse[]) { DIT, DAH, END };
-    case 'B': return (const morse[]) { DAH, DIT, DIT, DIT, END };
-    case 'C': return (const morse[]) { DAH, DIT, DAH, DIT, END };
-    case 'D': return (const morse[]) { DAH, DIT, DIT, END };
-    case 'E': return (const morse[]) { DIT, END };
-    case 'F': return (const morse[]) { DIT, DIT, DAH, DIT, END };
-    case 'G': return (const morse[]) { DAH, DAH, DIT, END };
-    case 'H': return (const morse[]) { DIT, DIT, DIT, DIT, END };
-    case 'I': return (const morse[]) { DIT, DIT, END };
-    case 'J': return (const morse[]) { DIT, DAH, DAH, DAH, END };
-    case 'K': return (const morse[]) { DAH, DIT, DAH, END };
-    case 'L': return (const morse[]) { DIT, DAH, DIT, DIT, END };
-    case 'M': return (const morse[]) { DAH, DAH, END };
-    case 'N': return (const morse[]) { DAH, DIT, END };
-    case 'O': return (const morse[]) { DAH, DAH, DAH, END };
-    case 'P': return (const morse[]) { DIT, DAH, DAH, DIT, END };
-    case 'Q': return (const morse[]) { DAH, DAH, DIT, DAH, END };
-    case 'R': return (const morse[]) { DIT, DAH, DIT, END };
-    case 'S': return (const morse[]) { DIT, DIT, DIT, END };
-    case 'T': return (const morse[]) { DAH, END };
-    case 'U': return (const morse[]) { DIT, DIT, DAH, END };
-    case 'V': return (const morse[]) { DIT, DIT, DIT, DAH, END };
-    case 'W': return (const morse[]) { DIT, DAH, DAH, END };
-    case 'X': return (const morse[]) { DAH, DIT, DIT, DAH, END };
-    case 'Y': return (const morse[]) { DAH, DIT, DAH, DAH, END };
-    case 'Z': return (const morse[]) { DAH, DAH, DIT, DIT, END };
-    case '0': return (const morse[]) { DAH, DAH, DAH, DAH, DAH, END };
-    case '1': return (const morse[]) { DIT, DAH, DAH, DAH, DAH, END };
-    case '2': return (const morse[]) { DIT, DIT, DAH, DAH, DAH, END };
-    case '3': return (const morse[]) { DIT, DIT, DIT, DAH, DAH, END };
-    case '4': return (const morse[]) { DIT, DIT, DIT, DIT, DAH, END };
-    case '5': return (const morse[]) { DIT, DIT, DIT, DIT, DIT, END };
-    case '6': return (const morse[]) { DAH, DIT, DIT, DIT, DIT, END };
-    case '7': return (const morse[]) { DAH, DAH, DIT, DIT, DIT, END };
-    case '8': return (const morse[]) { DAH, DAH, DAH, DIT, DIT, END };
-    case '9': return (const morse[]) { DAH, DAH, DAH, DAH, DIT, END };
-    case '.': return (const morse[]) { DIT, DAH, DIT, DAH, DIT, DAH, END };
-    case ',': return (const morse[]) { DAH, DAH, DIT, DIT, DAH, DAH, END };
-    case '?': return (const morse[]) { DIT, DIT, DAH, DAH, DIT, DIT, END };
-    case '\'':return (const morse[]) { DIT, DAH, DAH, DAH, DAH, DIT, END };
-    case '!': return (const morse[]) { DAH, DIT, DAH, DIT, DAH, DAH, END };
-    case '/': return (const morse[]) { DAH, DIT, DIT, DAH, DIT, END };
-    case '(': return (const morse[]) { DAH, DIT, DAH, DAH, DIT, END };
-    case ')': return (const morse[]) { DAH, DIT, DAH, DAH, DIT, DAH, END };
-    case '&': return (const morse[]) { DIT, DAH, DIT, DIT, DIT, END };
-    case ':': return (const morse[]) { DAH, DAH, DAH, DIT, DIT, DIT, END };
-    case ';': return (const morse[]) { DAH, DIT, DAH, DIT, DAH, DIT, END };
-    case '=': return (const morse[]) { DAH, DIT, DIT, DIT, DAH, END };
-    case '+': return (const morse[]) { DIT, DAH, DIT, DAH, DIT, END };
-    case '-': return (const morse[]) { DAH, DIT, DIT, DIT, DIT, DAH, END };
-    case '_': return (const morse[]) { DIT, DIT, DAH, DAH, DIT, DAH, END };
-    case '"': return (const morse[]) { DIT, DAH, DIT, DIT, DAH, DIT, END };
-    case '$': return (const morse[]) { DIT, DIT, DIT, DAH, DIT, DIT, DAH, END };
-    case '@': return (const morse[]) { DIT, DAH, DAH, DIT, DAH, DIT, END };
-    case '\xC6': return (const morse[]) { DIT, DAH, DIT, DAH, END }; // ae ligature
-    case '\xD8': return (const morse[]) { DAH, DAH, DAH, DIT, END }; // o slash
-    case '\xC5': return (const morse[]) { DIT, DAH, DAH, DIT, DAH, END }; // a ring
+    case 'A': return ".-";
+    case 'B': return "-...";
+    case 'C': return "-.-.";
+    case 'D': return "-..";
+    case 'E': return ".";
+    case 'F': return "..-.";
+    case 'G': return "--.";
+    case 'H': return "....";
+    case 'I': return "..";
+    case 'J': return ".---";
+    case 'K': return "-.-";
+    case 'L': return ".-..";
+    case 'M': return "--";
+    case 'N': return "-.";
+    case 'O': return "---";
+    case 'P': return ".--.";
+    case 'Q': return "--.-";
+    case 'R': return ".-.";
+    case 'S': return "...";
+    case 'T': return "-";
+    case 'U': return "..-";
+    case 'V': return "...-";
+    case 'W': return ".--";
+    case 'X': return "-..-";
+    case 'Y': return "-.--";
+    case 'Z': return "--..";
+    case '0': return "-----";
+    case '1': return ".----";
+    case '2': return "..---";
+    case '3': return "...--";
+    case '4': return "....-";
+    case '5': return ".....";
+    case '6': return "-....";
+    case '7': return "--...";
+    case '8': return "---..";
+    case '9': return "----.";
+    case '.': return ".-.-.-";
+    case ',': return "--..--";
+    case '?': return "..--..";
+    case '\'':return ".----.";
+    case '!': return "-.-.--";
+    case '/': return "-..-.";
+    case '(': return "-.--.";
+    case ')': return "-.--.-";
+    case '&': return ".-...";
+    case ':': return "---...";
+    case ';': return "-.-.-.";
+    case '=': return "-...-";
+    case '+': return ".-.-.";
+    case '-': return "-....-";
+    case '_': return "..--.-";
+    case '"': return ".-..-.";
+    case '$': return "...-..-";
+    case '@': return ".--.-.";
+    case '\xC6': return ".-.-"; // ae ligature
+    case '\xD8': return "---."; // o slash
+    case '\xC5': return ".--.-"; // a ring
     }
-    return (const morse[]) { END };
+    return 0;
 }
 
 MorseGenerator::MorseGenerator(QString input, std::string filename) :
@@ -133,8 +130,8 @@ void MorseGenerator::generate() {
             if (nextbreak < SENTENCE)
                 nextbreak = SENTENCE;
         } else {
-            const morse * atoms = code(*i);
-            if (atoms[0] == END) {
+            std::string atoms = code(*i);
+            if (atoms.empty()) {
                 debug << "Unknown character " << i->unicode() << std::endl;
             } else {
 #ifndef QT_NO_DEBUG
@@ -154,25 +151,17 @@ void MorseGenerator::generate() {
                     break;
                 }
                 nextbreak = LETTER;
-                while (*atoms != END) {
-#ifndef QT_NO_DEBUG
-                    debug << "Insert atom " << *atoms << std::endl;
-#endif
-                    if (*atoms == DIT) {
+                for (std::string::iterator i = atoms.begin(); i != atoms.end(); ++i) {
+                    if (*i == '.') {
                         snd.writef(signal, ditlength);
                         snd.writef(silence, atomlength-ditlength);
-                    } else if (*atoms == DAH) {
+                    } else if (*i == '-') {
                         snd.writef(signal, dahlength);
                         snd.writef(silence, atomlength-dahlength);
                     }
-                    ++atoms;
                 }
             }
         }
     }
     snd.writef(silence, wordpause);
-
-    if (!debug.str().empty()) {
-        QErrorMessage::qtHandler()->showMessage(debug.str().c_str());
-    }
 }
