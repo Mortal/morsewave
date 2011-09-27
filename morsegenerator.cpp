@@ -69,6 +69,9 @@ const morse * code(const QChar c) {
     case '"': return (const morse[]) { DIT, DAH, DIT, DIT, DAH, DIT, END };
     case '$': return (const morse[]) { DIT, DIT, DIT, DAH, DIT, DIT, DAH, END };
     case '@': return (const morse[]) { DIT, DAH, DAH, DIT, DAH, DIT, END };
+    case '\xC6': return (const morse[]) { DIT, DAH, DIT, DAH, END }; // ae ligature
+    case '\xD8': return (const morse[]) { DAH, DAH, DAH, DIT, END }; // o slash
+    case '\xC5': return (const morse[]) { DIT, DAH, DAH, DIT, DAH, END }; // a ring
     }
     return (const morse[]) { END };
 }
@@ -117,7 +120,10 @@ void MorseGenerator::generate() {
     reccpy(&silence[0], sizeof(float), sentencepause*sizeof(float));
 
     std::stringstream debug;
+
+#ifndef QT_NO_DEBUG
     debug << "Dit length: " << ditlength << " Dah length: " << dahlength << " atom length: " << atomlength << std::endl;
+#endif
     breaktype nextbreak = NONE;
     for (QString::iterator i = input.begin(); i != input.end(); ++i) {
         if (*i == ' ') {
@@ -131,7 +137,9 @@ void MorseGenerator::generate() {
             if (atoms[0] == END) {
                 debug << "Unknown character " << i->unicode() << std::endl;
             } else {
+#ifndef QT_NO_DEBUG
                 debug << "Insert " << nextbreak << std::endl;
+#endif
                 switch (nextbreak) {
                 case NONE:
                     break;
@@ -147,7 +155,9 @@ void MorseGenerator::generate() {
                 }
                 nextbreak = LETTER;
                 while (*atoms != END) {
+#ifndef QT_NO_DEBUG
                     debug << "Insert atom " << *atoms << std::endl;
+#endif
                     if (*atoms == DIT) {
                         snd.writef(signal, ditlength);
                         snd.writef(silence, atomlength-ditlength);
@@ -160,7 +170,7 @@ void MorseGenerator::generate() {
             }
         }
     }
-    snd.writef(silence, sentencepause);
+    snd.writef(silence, wordpause);
 
     if (!debug.str().empty()) {
         QErrorMessage::qtHandler()->showMessage(debug.str().c_str());
