@@ -1,9 +1,16 @@
 #include <QtGui>
 #include "morsewave.h"
 #include "morsegenerator.h"
+#include "morsewavesettings.h"
+#include <QErrorMessage>
 
 MorseWave::MorseWave(QApplication & app) {
     makeLayout(app);
+    readSettings();
+}
+
+void MorseWave::closeEvent(QCloseEvent *event) {
+    writeSettings();
 }
 
 void MorseWave::makeLayout(QApplication & app) {
@@ -48,6 +55,9 @@ QString MorseWave::getInput() {
  */
 QString MorseWave::getDir() {
     QString dirname = dir->text().trimmed();
+    if (dirname == "")
+        return dirname;
+
     if (!dirname.contains('/') && dirname.contains('\\'))
         dirname = dirname.replace('\\', '/');
     if (!dirname.endsWith('/'))
@@ -66,13 +76,44 @@ QString MorseWave::filename() {
     return target.fileName();
 }
 
-void MorseWave::gen() {
-    MorseGenerator generator(getInput(), QDir::toNativeSeparators(filename()).toStdString());
-    generator.generate();
+void MorseWave::displayMessage(const std::string & err) {
+    QErrorMessage::qtHandler()->showMessage(err.c_str());
 }
 
-int main(int argv, char **args)
-{
+void MorseWave::gen() {
+    if (getDir() == "") {
+        displayMessage("Choose the destination directory");
+        return;
+    }
+    try {
+        std::string file = QDir::toNativeSeparators(filename()).toStdString();
+        MorseGenerator generator(getInput(), file);
+        generator.generate();
+        displayMessage("Created sound file "+file);
+    } catch (morsegeneratorexception ex) {
+        displayMessage(ex.what());
+    }
+}
+
+void MorseWave::readSettings() {
+    MorseWaveSettings settings;
+    settings.beginGroup("window");
+    resize(settings.value("size", QSize(350, 300)).toSize());
+    move(settings.value("pos", QPoint(200, 200)).toPoint());
+    settings.endGroup();
+    dir->setText(settings.value("directory", "").toString());
+}
+
+void MorseWave::writeSettings() {
+    MorseWaveSettings settings;
+    settings.beginGroup("window");
+    settings.setValue("size", size());
+    settings.setValue("pos", pos());
+    settings.endGroup();
+    settings.setValue("directory", dir->text());
+}
+
+int main(int argv, char **args) {
     QApplication app(argv, args);
 
     MorseWave mw(app);

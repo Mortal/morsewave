@@ -2,7 +2,6 @@
 #include <sndfile.hh>
 #include <QtCore/qmath.h>
 #include <cstring>
-#include <QErrorMessage>
 #include <sstream>
 #include <iostream>
 
@@ -84,6 +83,13 @@ void reccpy(void * ptr, int initial, int length) {
         initial += amount;
     }
 }
+void MorseGenerator::snderrorcheck() {
+    if (snd->error() != SF_ERR_NO_ERROR) {
+        throw sndfileerror(snd->strError());
+        snd.reset(0);
+        return;
+    }
+}
 void MorseGenerator::generate() {
     const int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
     const int channels = 1;
@@ -97,11 +103,8 @@ void MorseGenerator::generate() {
     const int atomlength = samplerate/atomfrequency;
     const int ditlength = atomlength/3;
     const int dahlength = 2*atomlength/3;
-    SndfileHandle snd(filename, SFM_WRITE, format, channels, samplerate);
-    if (snd.error() != SF_ERR_NO_ERROR) {
-        QErrorMessage::qtHandler()->showMessage(("When trying to create sound "+filename+": "+snd.strError()).c_str());
-        return;
-    }
+    snd.reset(new SndfileHandle(filename, SFM_WRITE, format, channels, samplerate));
+    snderrorcheck();
 
     const int wavelength = samplerate/frequency;
 
@@ -141,27 +144,31 @@ void MorseGenerator::generate() {
                 case NONE:
                     break;
                 case LETTER:
-                    snd.writef(silence, letterpause);
+                    snd->writef(silence, letterpause);
                     break;
                 case WORD:
-                    snd.writef(silence, wordpause);
+                    snd->writef(silence, wordpause);
                     break;
                 case SENTENCE:
-                    snd.writef(silence, sentencepause);
+                    snd->writef(silence, sentencepause);
                     break;
                 }
+                snderrorcheck();
                 nextbreak = LETTER;
                 for (std::string::iterator i = atoms.begin(); i != atoms.end(); ++i) {
                     if (*i == '.') {
-                        snd.writef(signal, ditlength);
-                        snd.writef(silence, atomlength-ditlength);
+                        snd->writef(signal, ditlength);
+                        snd->writef(silence, atomlength-ditlength);
                     } else if (*i == '-') {
-                        snd.writef(signal, dahlength);
-                        snd.writef(silence, atomlength-dahlength);
+                        snd->writef(signal, dahlength);
+                        snd->writef(silence, atomlength-dahlength);
                     }
+                    snderrorcheck();
                 }
             }
         }
     }
-    snd.writef(silence, wordpause);
+    snd->writef(silence, wordpause);
+    snderrorcheck();
+    snd.reset(0);
 }

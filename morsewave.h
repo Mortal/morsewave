@@ -17,9 +17,16 @@ private:
     void makeLayout(QApplication &);
     QWidget * makeLayoutInput();
 
+    void displayMessage(const std::string & err);
+
     QString filename();
     QString getInput();
     QString getDir();
+
+    void readSettings();
+    void writeSettings();
+
+    void closeEvent(QCloseEvent *);
 
     QGridLayout * layout;
     QLabel * lblInput;
