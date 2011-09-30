@@ -5,10 +5,11 @@
 #include <QString>
 #include <stdexcept>
 #include <memory>
+#include "morseconfiguration.h"
 
 class MorseGenerator {
 public:
-    MorseGenerator(QString input, std::string filename);
+    MorseGenerator(QString input, std::string filename, MorseConfiguration config);
     void generate();
 
 private:
@@ -16,6 +17,7 @@ private:
     std::string filename;
     std::auto_ptr<class SndfileHandle> snd;
     void snderrorcheck();
+    MorseConfiguration config;
 };
 
 class morsegeneratorexception : public std::exception {

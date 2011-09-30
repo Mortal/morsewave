@@ -72,8 +72,8 @@ std::string code(const QChar c) {
     return 0;
 }
 
-MorseGenerator::MorseGenerator(QString input, std::string filename) :
-input(input), filename(filename) {
+MorseGenerator::MorseGenerator(QString input, std::string filename, MorseConfiguration config) :
+input(input), filename(filename), config(config) {
     // Empty ctor.
 }
 void reccpy(void * ptr, int initial, int length) {
@@ -94,36 +94,35 @@ void MorseGenerator::generate() {
     const int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
     const int channels = 1;
     const int samplerate = 44100;
-    const int frequency = 440; // signal frequency
+    const int frequency = config.frequency; // signal frequency
     const float amplitude = 0.7;
-    const int letterpause = samplerate*3/2; // 1.5 seconds
-    const int wordpause = samplerate*3; // 3 seconds
-    const int sentencepause = samplerate*6; // 6 seconds
-    const int atomfrequency = 3; // atoms (dit/dah) per second
-    const int atomlength = samplerate/atomfrequency;
-    const int ditlength = atomlength/3;
-    const int dahlength = 2*atomlength/3;
+    const int letterpause = config.letterseparator*samplerate/1000; // 1.5 seconds
+    const int wordpause = config.wordseparator*samplerate/1000; // 3 seconds
+    const int sentencepause = config.sentenceseparator*samplerate/1000; // 6 seconds
+    const int ditlength = config.dit*samplerate/1000;
+    const int dahlength = config.dah*samplerate/1000;
+    const int ditpause = config.ditpause*samplerate/1000;
+    const int dahpause = config.dahpause*samplerate/1000;
+    const int signallength = std::max(ditlength,dahlength);
+    const int silencelength = std::max(std::max(std::max(letterpause, wordpause), sentencepause), std::max(ditpause, dahpause));
     snd.reset(new SndfileHandle(filename, SFM_WRITE, format, channels, samplerate));
     snderrorcheck();
 
     const int wavelength = samplerate/frequency;
 
-    float signal[dahlength];
+    float signal[signallength];
     qreal pi = (qreal) 2.0*qAcos(0);
     for (int i = 0; i < wavelength; ++i) {
         signal[i] = amplitude * qSin((qreal) 2.0 * i * pi / (qreal) wavelength);
     }
-    reccpy(&signal[0], wavelength*sizeof(int), dahlength*sizeof(int));
+    reccpy(&signal[0], wavelength*sizeof(int), signallength*sizeof(int));
 
-    float silence[sentencepause];
+    float silence[silencelength];
     silence[0] = 0.0;
-    reccpy(&silence[0], sizeof(float), sentencepause*sizeof(float));
+    reccpy(&silence[0], sizeof(float), silencelength*sizeof(float));
 
     std::stringstream debug;
 
-#ifndef QT_NO_DEBUG
-    debug << "Dit length: " << ditlength << " Dah length: " << dahlength << " atom length: " << atomlength << std::endl;
-#endif
     breaktype nextbreak = NONE;
     for (QString::iterator i = input.begin(); i != input.end(); ++i) {
         if (*i == ' ') {
@@ -158,10 +157,10 @@ void MorseGenerator::generate() {
                 for (std::string::iterator i = atoms.begin(); i != atoms.end(); ++i) {
                     if (*i == '.') {
                         snd->writef(signal, ditlength);
-                        snd->writef(silence, atomlength-ditlength);
+                        snd->writef(silence, ditpause);
                     } else if (*i == '-') {
                         snd->writef(signal, dahlength);
-                        snd->writef(silence, atomlength-dahlength);
+                        snd->writef(silence, dahpause);
                     }
                     snderrorcheck();
                 }

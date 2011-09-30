@@ -5,6 +5,7 @@
 #include <QErrorMessage>
 
 MorseWave::MorseWave(QApplication & app) {
+    config = new MorseConfigurationModel();
     makeLayout(app);
     readSettings();
 }
@@ -28,13 +29,22 @@ void MorseWave::makeLayout(QApplication & app) {
     generate->setText(tr("Generate"));
     QObject::connect(generate, SIGNAL(clicked()), this, SLOT(gen()));
 
-    layout->addWidget(lblInput, 0, 0);
-    layout->addWidget(input, 0, 1, 1, 2);
-    layout->addWidget(lblDir, 1, 0);
-    layout->addWidget(dir, 1, 1);
-    layout->addWidget(dirbrowse, 1, 2);
+    generationsettings = new QTableView();
+    generationsettings->setModel(config);
+    generationsettings->resize(100, 100);
 
-    layout->addWidget(generate, 2, 0, 1, 3, Qt::AlignHCenter);
+    int y = 0;
+
+    layout->addWidget(lblInput, y, 0);
+    layout->addWidget(input, y, 1, 1, 2);
+    ++y;
+    layout->addWidget(lblDir, y, 0);
+    layout->addWidget(dir, y, 1);
+    layout->addWidget(dirbrowse, y, 2);
+    ++y;
+    layout->addWidget(generationsettings, y, 1, 1, 2);
+    ++y;
+    layout->addWidget(generate, y, 0, 1, 3, Qt::AlignHCenter);
 
     setLayout(layout);
 }
@@ -87,7 +97,7 @@ void MorseWave::gen() {
     }
     try {
         std::string file = QDir::toNativeSeparators(filename()).toStdString();
-        MorseGenerator generator(getInput(), file);
+        MorseGenerator generator(getInput(), file, config->getAll());
         generator.generate();
         displayMessage("Created sound file "+file);
     } catch (morsegeneratorexception ex) {
@@ -101,6 +111,9 @@ void MorseWave::readSettings() {
     resize(settings.value("size", QSize(350, 300)).toSize());
     move(settings.value("pos", QPoint(200, 200)).toPoint());
     settings.endGroup();
+    settings.beginGroup("morse");
+    config->readSettings(settings);
+    settings.endGroup();
     dir->setText(settings.value("directory", "").toString());
 }
 
@@ -109,6 +122,9 @@ void MorseWave::writeSettings() {
     settings.beginGroup("window");
     settings.setValue("size", size());
     settings.setValue("pos", pos());
+    settings.endGroup();
+    settings.beginGroup("morse");
+    config->writeSettings(settings);
     settings.endGroup();
     settings.setValue("directory", dir->text());
 }

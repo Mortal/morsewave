@@ -2,6 +2,7 @@
 #define MORSEWAVE_H
 
 #include <QtGui>
+#include "morseconfigurationmodel.h"
 
 class MorseWave : public QWidget {
     Q_OBJECT
@@ -28,6 +29,8 @@ private:
 
     void closeEvent(QCloseEvent *);
 
+    MorseConfigurationModel * config;
+
     QGridLayout * layout;
     QLabel * lblInput;
     QLabel * lblDir;
@@ -35,6 +38,7 @@ private:
     QLineEdit * dir;
     QPushButton * dirbrowse;
     QPushButton * generate;
+    QTableView * generationsettings;
 };
 
 #endif // MORSEWAVE_H
