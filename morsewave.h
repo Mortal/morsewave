@@ -18,7 +18,7 @@ private:
     void makeLayout(QApplication &);
     QWidget * makeLayoutInput();
 
-    void displayMessage(const std::string & err);
+    void displayMessage(const QString & err);
 
     QString filename();
     QString getInput();

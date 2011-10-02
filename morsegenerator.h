@@ -1,45 +1,41 @@
 #ifndef MORSEGENERATOR_H
 #define MORSEGENERATOR_H
 
-#include <string>
 #include <QString>
-#include <stdexcept>
-#include <memory>
+#include <QScopedPointer>
+#include <sndfile.hh>
 #include "morseconfiguration.h"
 
 class MorseGenerator {
 public:
-    MorseGenerator(QString input, std::string filename, MorseConfiguration config);
+    MorseGenerator(const QString & input, const QString & filename, const MorseConfiguration & config);
     void generate();
 
 private:
     QString input;
-    std::string filename;
-    std::auto_ptr<class SndfileHandle> snd;
+    QString filename;
+    QScopedPointer<SndfileHandle> snd;
     void snderrorcheck();
     MorseConfiguration config;
 };
 
-class morsegeneratorexception : public std::exception {
+class morsegeneratorexception {
 public:
-    morsegeneratorexception(const std::string & what) : _what(what.c_str()) {}
-    morsegeneratorexception(const char * what) : _what(what) {}
-    const char * what() {
+    morsegeneratorexception(const QString & what) : _what(what) {}
+    QString what() {
         return _what;
     }
 private:
-    const char * _what;
+    QString _what;
 };
 
 class sndfileerror : public morsegeneratorexception {
 public:
-    sndfileerror(const std::string & what) : morsegeneratorexception(what.c_str()) {}
-    sndfileerror(const char * what) : morsegeneratorexception(what) {}
+    sndfileerror(const QString & what) : morsegeneratorexception(what) {}
 };
 
 class morseinputerror : public morsegeneratorexception {
-    morseinputerror(const std::string & what) : morsegeneratorexception(what.c_str()) {}
-    morseinputerror(const char * what) : morsegeneratorexception(what) {}
+    morseinputerror(const QString & what) : morsegeneratorexception(what) {}
 };
 
 #endif // MORSEGENERATOR_H

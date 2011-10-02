@@ -86,8 +86,8 @@ QString MorseWave::filename() {
     return target.fileName();
 }
 
-void MorseWave::displayMessage(const std::string & err) {
-    QErrorMessage::qtHandler()->showMessage(err.c_str());
+void MorseWave::displayMessage(const QString & err) {
+    QErrorMessage::qtHandler()->showMessage(err);
 }
 
 void MorseWave::gen() {
@@ -96,7 +96,7 @@ void MorseWave::gen() {
         return;
     }
     try {
-        std::string file = QDir::toNativeSeparators(filename()).toStdString();
+        QString file = QDir::toNativeSeparators(filename());
         MorseGenerator generator(getInput(), file, config->getAll());
         generator.generate();
         displayMessage("Created sound file "+file);

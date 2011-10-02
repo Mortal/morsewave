@@ -1,15 +1,12 @@
 #include "morsegenerator.h"
-#include <sndfile.hh>
 #include <QtCore/qmath.h>
-#include <cstring>
-#include <sstream>
-#include <iostream>
+#include <QTextStream>
 
 enum breaktype {
     NONE, LETTER, WORD, SENTENCE
 };
 
-std::string code(const QChar c) {
+QString code(const QChar c) {
     switch (c.toLatin1()) {
     case 'A': return ".-";
     case 'B': return "-...";
@@ -72,7 +69,7 @@ std::string code(const QChar c) {
     return 0;
 }
 
-MorseGenerator::MorseGenerator(QString input, std::string filename, MorseConfiguration config) :
+MorseGenerator::MorseGenerator(const QString & input, const QString & filename, const MorseConfiguration & config) :
 input(input), filename(filename), config(config) {
     // Empty ctor.
 }
@@ -105,7 +102,7 @@ void MorseGenerator::generate() {
     const int dahpause = config.dahpause*samplerate/1000;
     const int signallength = std::max(ditlength,dahlength);
     const int silencelength = std::max(std::max(std::max(letterpause, wordpause), sentencepause), std::max(ditpause, dahpause));
-    snd.reset(new SndfileHandle(filename, SFM_WRITE, format, channels, samplerate));
+    snd.reset(new SndfileHandle(filename.toStdString(), SFM_WRITE, format, channels, samplerate));
     snderrorcheck();
 
     const int wavelength = samplerate/frequency;
@@ -121,7 +118,7 @@ void MorseGenerator::generate() {
     silence[0] = 0.0;
     reccpy(&silence[0], sizeof(float), silencelength*sizeof(float));
 
-    std::stringstream debug;
+    QTextStream debug;
 
     breaktype nextbreak = NONE;
     for (QString::iterator i = input.begin(); i != input.end(); ++i) {
@@ -132,12 +129,12 @@ void MorseGenerator::generate() {
             if (nextbreak < SENTENCE)
                 nextbreak = SENTENCE;
         } else {
-            std::string atoms = code(*i);
-            if (atoms.empty()) {
-                debug << "Unknown character " << i->unicode() << std::endl;
+            QString atoms = code(*i);
+            if (atoms.isEmpty()) {
+                debug << "Unknown character " << i->unicode() << endl;
             } else {
 #ifndef QT_NO_DEBUG
-                debug << "Insert " << nextbreak << std::endl;
+                debug << "Insert " << nextbreak << endl;
 #endif
                 switch (nextbreak) {
                 case NONE:
@@ -154,7 +151,7 @@ void MorseGenerator::generate() {
                 }
                 snderrorcheck();
                 nextbreak = LETTER;
-                for (std::string::iterator i = atoms.begin(); i != atoms.end(); ++i) {
+                for (QChar * i = atoms.begin(); i != atoms.end(); ++i) {
                     if (*i == '.') {
                         snd->writef(signal, ditlength);
                         snd->writef(silence, ditpause);
