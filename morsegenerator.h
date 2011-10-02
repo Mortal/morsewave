@@ -17,6 +17,7 @@ private:
     QScopedPointer<SndfileHandle> snd;
     void snderrorcheck();
     MorseConfiguration config;
+    static QString code(const QChar c);
 };
 
 class morsegeneratorexception {
