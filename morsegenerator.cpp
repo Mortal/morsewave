@@ -124,40 +124,44 @@ void MorseGenerator::generate() {
         if (*i == ' ') {
             if (nextbreak < WORD)
                 nextbreak = WORD;
-        } else if (*i == '.') {
+            continue;
+        }
+        if (*i == '.') {
             if (nextbreak < SENTENCE)
                 nextbreak = SENTENCE;
-        } else {
-            QString atoms = code(*i);
-            if (atoms.isEmpty()) {
-                qDebug() << "Unknown character " << i->unicode();
-            } else {
-                switch (nextbreak) {
-                case NONE:
-                    break;
-                case LETTER:
-                    snd->writef(silence, letterpause);
-                    break;
-                case WORD:
-                    snd->writef(silence, wordpause);
-                    break;
-                case SENTENCE:
-                    snd->writef(silence, sentencepause);
-                    break;
-                }
-                snderrorcheck();
-                nextbreak = LETTER;
-                for (QChar * i = atoms.begin(); i != atoms.end(); ++i) {
-                    if (*i == '.') {
-                        snd->writef(signal, ditlength);
-                        snd->writef(silence, ditpause);
-                    } else if (*i == '-') {
-                        snd->writef(signal, dahlength);
-                        snd->writef(silence, dahpause);
-                    }
-                    snderrorcheck();
-                }
+            continue;
+        }
+        QString atoms = code(*i);
+        if (atoms.isEmpty()) {
+            qDebug() << "Unknown character " << i->unicode();
+            continue;
+        }
+
+        switch (nextbreak) {
+        case NONE:
+            break;
+        case LETTER:
+            snd->writef(silence, letterpause);
+            break;
+        case WORD:
+            snd->writef(silence, wordpause);
+            break;
+        case SENTENCE:
+            snd->writef(silence, sentencepause);
+            break;
+        }
+        snderrorcheck();
+        nextbreak = LETTER;
+
+        for (QChar * i = atoms.begin(); i != atoms.end(); ++i) {
+            if (*i == '.') {
+                snd->writef(signal, ditlength);
+                snd->writef(silence, ditpause);
+            } else if (*i == '-') {
+                snd->writef(signal, dahlength);
+                snd->writef(silence, dahpause);
             }
+            snderrorcheck();
         }
     }
     snd->writef(silence, wordpause);
