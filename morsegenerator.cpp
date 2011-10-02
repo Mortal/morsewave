@@ -1,6 +1,7 @@
 #include "morsegenerator.h"
 #include <QtCore/qmath.h>
 #include <QTextStream>
+#include <QDebug>
 
 enum breaktype {
     NONE, LETTER, WORD, SENTENCE
@@ -118,8 +119,6 @@ void MorseGenerator::generate() {
     silence[0] = 0.0;
     reccpy(&silence[0], sizeof(float), silencelength*sizeof(float));
 
-    QTextStream debug;
-
     breaktype nextbreak = NONE;
     for (QString::iterator i = input.begin(); i != input.end(); ++i) {
         if (*i == ' ') {
@@ -131,11 +130,8 @@ void MorseGenerator::generate() {
         } else {
             QString atoms = code(*i);
             if (atoms.isEmpty()) {
-                debug << "Unknown character " << i->unicode() << endl;
+                qDebug() << "Unknown character " << i->unicode();
             } else {
-#ifndef QT_NO_DEBUG
-                debug << "Insert " << nextbreak << endl;
-#endif
                 switch (nextbreak) {
                 case NONE:
                     break;
