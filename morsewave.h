@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include "morseconfigurationmodel.h"
+#include "morseplayer.h"
 
 class MorseWave : public QWidget {
     Q_OBJECT
@@ -13,6 +14,7 @@ public:
 public slots:
     void promptDir();
     void gen();
+    void play();
 
 private:
     void makeLayout(QApplication &);
@@ -31,13 +33,18 @@ private:
 
     MorseConfigurationModel * config;
 
+    QScopedPointer<MorsePlayer> player;
+
     QGridLayout * layout;
+    QWidget * buttons;
+    QHBoxLayout * buttonlayout;
     QLabel * lblInput;
     QLabel * lblDir;
     QTextEdit * input;
     QLineEdit * dir;
     QPushButton * dirbrowse;
     QPushButton * generate;
+    QPushButton * playbutton;
     QTableView * generationsettings;
 };
 

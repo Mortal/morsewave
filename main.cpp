@@ -21,13 +21,19 @@ void MorseWave::makeLayout(QApplication & app) {
     lblDir = new QLabel(tr("Output folder"));
     input = new QTextEdit();
     input->setAcceptRichText(false);
+    input->setTabChangesFocus(true);
     dir = new QLineEdit();
     dirbrowse = new QPushButton();
     dirbrowse->setText(tr("Browse..."));
     QObject::connect(dirbrowse, SIGNAL(clicked()), this, SLOT(promptDir()));
+    buttons = new QWidget();
+    buttonlayout = new QHBoxLayout();
     generate = new QPushButton();
     generate->setText(tr("Generate"));
     QObject::connect(generate, SIGNAL(clicked()), this, SLOT(gen()));
+    playbutton = new QPushButton();
+    playbutton->setText(tr("Play"));
+    QObject::connect(playbutton, SIGNAL(clicked()), this, SLOT(play()));
 
     generationsettings = new QTableView();
     generationsettings->setModel(config);
@@ -44,7 +50,10 @@ void MorseWave::makeLayout(QApplication & app) {
     ++y;
     layout->addWidget(generationsettings, y, 1, 1, 2);
     ++y;
-    layout->addWidget(generate, y, 0, 1, 3, Qt::AlignHCenter);
+    layout->addWidget(buttons, y, 0, 1, 3, Qt::AlignHCenter);
+    buttons->setLayout(buttonlayout);
+    buttonlayout->addWidget(generate);
+    buttonlayout->addWidget(playbutton);
 
     setLayout(layout);
 }
@@ -103,6 +112,15 @@ void MorseWave::gen() {
     } catch (morsegeneratorexception ex) {
         displayMessage(ex.what());
     }
+}
+
+void MorseWave::play() {
+    player.reset(new MorsePlayer());
+    {
+        MorseGenerator generator(getInput(), player->filename(), config->getAll());
+        generator.generate();
+    }
+    player->play();
 }
 
 void MorseWave::readSettings() {
