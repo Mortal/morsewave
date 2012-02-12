@@ -1,3 +1,4 @@
+// vim:set ts=8 sw=4 sts=4 et:
 #ifndef MORSEGENERATOR_H
 #define MORSEGENERATOR_H
 
