@@ -1,1 +1,5 @@
 *.user
+*.o
+morsewave
+Makefile
+moc_*.cpp
