@@ -1,11 +1,13 @@
 #include "morseplayer.h"
 #include <QDir>
 #include <QDebug>
+#include <QCoreApplication>
 
 MorsePlayer::MorsePlayer(QObject *parent) :
     QObject(parent),
     player(0)
 {
+    QCoreApplication::setApplicationName("MorseWave");
 }
 
 MorsePlayer::~MorsePlayer() {

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QTemporaryFile>
-#include <Phonon/MediaObject>
+#include <phonon/MediaObject>
 
 class MorsePlayer : public QObject
 {

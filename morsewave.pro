@@ -17,7 +17,9 @@ HEADERS += \
 
 win32: LIBS += -L$$PWD/libsndfile/lib/ -llibsndfile-1
 
-INCLUDEPATH += $$PWD/libsndfile/include
-DEPENDPATH += $$PWD/libsndfile/include
+win32: INCLUDEPATH += $$PWD/libsndfile/include
+win32: DEPENDPATH += $$PWD/libsndfile/include
 
 QT += phonon
+
+unix:!macx:!symbian: LIBS += -lsndfile
