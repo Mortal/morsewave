@@ -43,7 +43,7 @@ QModelIndex MorseConfigurationModel::index(int row, int column, const QModelInde
     return QModelIndex();
 }
 
-QModelIndex MorseConfigurationModel::parent(const QModelIndex & index) const {
+QModelIndex MorseConfigurationModel::parent(const QModelIndex & /*index*/) const {
     return QModelIndex();
 }
 

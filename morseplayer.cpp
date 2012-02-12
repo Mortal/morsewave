@@ -36,7 +36,7 @@ void MorsePlayer::play() {
         player->play();
 }
 
-void MorsePlayer::stateChanged(Phonon::State to, Phonon::State from) {
+void MorsePlayer::stateChanged(Phonon::State to, Phonon::State /*from*/) {
     if (to == Phonon::ErrorState)
         qDebug() << "Phonon error:" << player->errorString();
     if (to != Phonon::PlayingState && to != Phonon::LoadingState && to != Phonon::BufferingState)

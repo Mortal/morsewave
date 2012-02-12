@@ -10,11 +10,11 @@ MorseWave::MorseWave(QApplication & app) {
     readSettings();
 }
 
-void MorseWave::closeEvent(QCloseEvent *event) {
+void MorseWave::closeEvent(QCloseEvent */*event*/) {
     writeSettings();
 }
 
-void MorseWave::makeLayout(QApplication & app) {
+void MorseWave::makeLayout(QApplication & /*app*/) {
     layout = new QGridLayout();
 
     lblInput = new QLabel(tr("Text"));
